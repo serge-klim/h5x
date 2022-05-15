@@ -1,0 +1,17 @@
+# local BENCHMARK_ROOT = /opt/benchmark ;
+# lib benchmark :
+#            :  <search>$(BENCHMARK_ROOT)/lib
+#            :
+#            :  <include>$(BENCHMARK_ROOT)/include           
+#            ;
+
+exe runner
+	:
+      benchmark.cpp	
+	  /boost//headers
+	  /boost//system/<link>static
+      /boost//filesystem/<link>static
+      /boost//iostreams/<link>static	
+      /h5x//h5x
+	  /user-config//benchmark
+	;

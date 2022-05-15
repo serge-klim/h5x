@@ -16,3 +16,14 @@ if(BUILD_TESTS)
   enable_testing()
   add_subdirectory(test)
 endif ()
+
+add_subdirectory(explorer)
+add_subdirectory(benchmark)
+#add_subdirectory(stats)
+#add_subdirectory(log)
+#add_subdirectory(runner)
+#add_subdirectory(concurent)
+#add_subdirectory(qbenchmark)
+#add_subdirectory(cpu_time)
+
+
