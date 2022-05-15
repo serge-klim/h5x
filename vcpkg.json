@@ -12,6 +12,7 @@
     "boost-fusion",
     "boost-describe",
     "boost-range",
-    "boost-test"
+    "boost-test",
+    "boost-log"
   ]
 }
