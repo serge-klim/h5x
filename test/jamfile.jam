@@ -1,0 +1,13 @@
+using testing ;
+
+project tests ;
+
+unit-test test :
+        test.cpp
+		iterator_test.cpp
+        /h5x//h5x
+   	    /boost//headers        
+		/boost//unit_test_framework/<link>static
+    ;
+
+
