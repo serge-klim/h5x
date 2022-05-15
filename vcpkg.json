@@ -1,0 +1,18 @@
+{
+  "dependencies": [
+    {
+      "name": "hdf5",
+      "features": [
+        "cpp"
+      ]
+    },
+    "boost-iterator",
+    "boost-program-options",
+    "boost-filesystem",
+    "boost-iostreams",
+    "boost-format",
+    "boost-stacktrace",
+    "boost-test",
+    "boost-log"
+  ]
+}

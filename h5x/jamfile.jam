@@ -1,0 +1,8 @@
+
+alias h5x
+	: /user-config//hdf5_cpp
+    : <library>/boost//headers
+    : # no default build
+    : <include>..
+    ;
+
