@@ -19,7 +19,7 @@ endif ()
 
 add_subdirectory(explorer)
 add_subdirectory(benchmark)
-#add_subdirectory(stats)
+add_subdirectory(write)
 #add_subdirectory(log)
 #add_subdirectory(runner)
 #add_subdirectory(concurent)
