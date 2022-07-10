@@ -1,0 +1,65 @@
+language: cpp
+sudo: false
+
+branches:
+  except:
+  - build-cfg
+
+matrix:
+  include:
+    - os: linux
+      dist: focal
+      env: >
+           COMPILER=clang++-12 TOOLSET=clang CPPSTD=2a
+           BOOST_VER=1.75.0
+      addons:
+        apt:
+          update: true
+          sources:
+            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-12 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+          packages:
+            - clang-12
+            - libc++-12-dev
+            - libc++abi-12-dev
+			- libbenchmark-dev
+env:
+  global:
+    CODECOV_TOKEN="56b8a39c-e8af-4203-b273-c659ad985abe"
+
+install:
+  - |
+    if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
+    cd ${TRAVIS_BUILD_DIR}
+  ############################################################################
+  # Install libc++ and libc++abi if needed
+  ############################################################################
+  - |
+    if [[ "${CXX%%+*}" == "clang" ]]; then
+      bash <( curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/travis/lib++.install)
+      [ $? -ne 0 ] && exit 1
+      export B2FLAGS="${B2FLAGS} cxxflags=-isystem${TRAVIS_BUILD_DIR}/llvm/out/include/c++/v1 linkflags=-L${TRAVIS_BUILD_DIR}/llvm/out/lib"
+      export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${TRAVIS_BUILD_DIR}/llvm/out/lib"
+    fi
+  ############################################################################
+  # Download boost and build boost tests
+  ############################################################################
+  - |
+    cd ${TRAVIS_BUILD_DIR}
+    curl --retry 5 -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/user-cfg.jam > user-cfg.jam
+    bash <( curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/travis/boost.install) toolset=${TOOLSET} cxxstd=${CPPSTD} ${B2FLAGS} address-model=64 threading=multi --user-config=${TRAVIS_BUILD_DIR}/user-cfg.jam --layout=versioned --with-test stage debug
+    export BOOST_ROOT=${TRAVIS_BUILD_DIR}/boost_${BOOST_VER//./_}
+before_script:
+  - |
+    if [[ "${COVERAGE}" == "ON" ]]; then
+      export B2FLAGS="${B2FLAGS} cxxflags=\"-fprofile-instr-generate\" cxxflags=\"-fcoverage-mapping\" linkflags=\"-fprofile-instr-generate\""
+    fi
+script:
+  - ${BOOST_ROOT}/b2 toolset=${TOOLSET} cxxstd=${CPPSTD} ${B2FLAGS} address-model=64 threading=multi --user-config=${TRAVIS_BUILD_DIR}/user-cfg.jam -a --layout=versioned -sBOOST_ROOT=${BOOST_ROOT} -sBOOST_BUILD_PATH=${BOOST_ROOT} -sBOOST_VER=x64-${BOOST_VER%.*} -sBOOST_LIBS=${BOOST_ROOT}/stage/lib debug
+after_success:
+  - |
+    if [[ "${COVERAGE}" == "ON" ]]; then
+      llvm-profdata-6.0 merge -sparse default.profraw -o bobl.profdata
+      llvm-cov-6.0 show $(find tests/bin -name test) -instr-profile=bobl.profdata > coverage.txt
+      bash <(curl -s https://codecov.io/bash)
+    fi

@@ -1,0 +1,13 @@
+using testing ;
+
+project tests ;
+
+unit-test test :
+        test.cpp
+		bizarre_test.cpp
+        /unrelated-benchmarks//utils/bizarre
+   	    /boost//headers        
+		/boost//unit_test_framework/<link>static
+    ;
+
+

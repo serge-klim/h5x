@@ -1,0 +1,12 @@
+
+obj bizarre_cpp : bizarre.cpp :
+				<toolset>clang:<cflags>-Rpass-missed=loop-vectorize 
+				<toolset>msvc:<cflags>/Qvec-report:2 ;
+
+lib bizarre
+	: bizarre_cpp
+    : <library>/boost//headers
+    : # no default build
+    : <include>..
+    ;
+
