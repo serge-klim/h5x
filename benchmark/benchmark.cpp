@@ -89,10 +89,52 @@ BENCHMARK_DEFINE_F(Fixture, meta_loop) (benchmark::State& state)
    }
 }
 
-static constexpr auto nitterations = 1000;
-BENCHMARK_REGISTER_F(Fixture, packed_streight_loop)->Iterations(nitterations);
-BENCHMARK_REGISTER_F(Fixture, streight_loop)->Iterations(nitterations);
-BENCHMARK_REGISTER_F(Fixture, meta_loop)->Iterations(nitterations);
+//static constexpr auto nitterations = 1000;
+//BENCHMARK_REGISTER_F(Fixture, packed_streight_loop)->Iterations(nitterations);
+//BENCHMARK_REGISTER_F(Fixture, streight_loop)->Iterations(nitterations);
+//BENCHMARK_REGISTER_F(Fixture, meta_loop)->Iterations(nitterations);
+
+
+struct SameSignFixture : public benchmark::Fixture
+{
+   using int_type = std::int32_t;
+
+   SameSignFixture() : integers{1000}
+   {
+      std::random_device rd;
+      std::mt19937 gen{rd()}; // Standard mersenne_twister_engine seeded with rd()
+      std::uniform_int_distribution<dump_reason_t> distrib{1};
+      std::generate(begin(integers), end(integers), std::bind(distrib, gen));
+   }
+
+   std::vector<int_type> integers;
+};
+
+BENCHMARK_DEFINE_F(SameSignFixture, same_sign_mul) (benchmark::State& state)
+{
+   auto i = 0;
+   auto n = integers.size();
+   for (auto _ : state) {
+      benchmark::DoNotOptimize(bizarre::mul::same_sing(integers[i], integers[i + 1]));
+      i = (i + 2) % n;
+   }
+}
+
+BENCHMARK_DEFINE_F(SameSignFixture, same_sign) (benchmark::State& state)
+{
+   auto i = 0;
+   auto n = integers.size();
+   for (auto _ : state) {
+      benchmark::DoNotOptimize(bizarre::same_sing(integers[i], integers[i + 1]));
+      i = (i + 2) % n;
+   }
+}
+
+static constexpr auto nitterations = 100000000;
+BENCHMARK_REGISTER_F(SameSignFixture, same_sign)->Iterations(nitterations);
+BENCHMARK_REGISTER_F(SameSignFixture, same_sign_mul)->Iterations(nitterations);
+
+
 
 BENCHMARK_MAIN();
 
