@@ -101,6 +101,12 @@ int main(int argc, char* argv[])
       assert(argc > 0 && "oops! that is totally unexpected!!!");
       if(!load_config(argv[0], vm))
          notify(vm); 
+      
+      std::ostream& dump(std::filesystem::path const& filename, std::ostream& out);
+      dump("C:/Users/serge/Documents/projects/hdf5/build.lin/tools/test/h5diff/testfiles/compounds_array_vlen1.h5", std::clog) << std::endl;
+      std::clog << "===================================================================================================" << std::endl;
+      dump("C:/Users/serge/Documents/projects/hdf5/build.lin/tools/test/h5repack/testfiles/h5repack_nested_8bit_enum.h5", std::clog) << std::endl;
+      std::clog << "===================================================================================================" << std::endl;
       std::ostream& dump(std::filesystem::path const&, std::string const&, std::ostream&);
       //dump("C:/Users/serge/Documents/projects/hdf5/build.lin/tools/test/h5diff/testfiles/h5diff_hyper1.h5", "/big", std::clog) << std::endl;
       dump("C:/Users/serge/Documents/projects/hdf5/build.lin/tools/test/h5repack/testfiles/h5repack_nested_8bit_enum.h5", "/tracks/1/trace", std::clog) << std::endl;

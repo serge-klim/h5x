@@ -1,4 +1,5 @@
 //#include "h5x/iterator.hpp"
+#include "h5x/h5_utility.hpp"
 #include "H5Cpp.h"
 #include "hdf5.h"
 #include <boost/format.hpp>
@@ -6,10 +7,12 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include <string_view>
 #include <numeric>
 #include <algorithm>
 #include <locale>
 #include <functional>
+#include <ranges>
 #include <stdexcept>
 #include <cassert>
 
@@ -140,29 +143,10 @@ std::ostream& dump(H5::DataSet const& dataset, std::ostream& out)
    }
    out << '\n';
    auto ds_plist = dataset.getCreatePlist();
-   switch (auto layout = ds_plist.getLayout()) 
-   {
-      case H5D_LAYOUT_ERROR:
-         out << "error";
-         break;
-      case H5D_COMPACT:
-         out << "H5D_COMPACT raw data is small(< 64KB)";
-         break;
-      case H5D_CONTIGUOUS:
-         out << "H5D_CONTIGUOUS contiguous layout";
-         break;
-      case H5D_CHUNKED:
-         out << "H5D_CHUNKED chunked or tiled layout";
-         dump_chunks(dataset, space, ds_plist, out);
-         break;
-      case H5D_VIRTUAL:
-         out << "H5D_VIRTUAL actual data is stored in other datasets";
-         break;
-      case H5D_NLAYOUTS: // this one must be last!"
-         [[fallthrough]];
-      default:
-         out << "unknow laout" << layout;
-   }
+   auto layout = ds_plist.getLayout();
+   out << h5x::to_string(layout);
+   if (layout == H5D_CHUNKED)
+      dump_chunks(dataset, space, ds_plist, out);
 
   //auto range = h5x::make_iterator_range<std::uint8_t>(dataset);
   //std::distance(range.begin(), range.end());
@@ -188,5 +172,37 @@ std::ostream& dump(std::filesystem::path const& filename, std::string const& dat
     return out;
 }
 
+std::ostream& dump(std::string path, H5::H5Location const& location, std::ostream& out) {
+   out << path << ":\n";
+   auto n = location.getNumObjs();
+   for (auto i : std::views::iota(decltype(n){0}, n)) {
+      H5std_string type_name;
+      auto type = location.getObjTypeByIdx(i, type_name);
+      auto name = location.getObjnameByIdx(i);
+      out << i << ':' << name << '-' << type_name << '\n';
+      //out << i << ':' << name << ':' << type_name(type) << '\n';
+      switch (type) {
+         case H5G_DATASET:
+            dump(location.openDataSet(name), out);
+            break;
+         case H5G_GROUP: {
+            path += name;
+            path += '/';
+            dump(path + name, location.openGroup(name), out);
+            break;
+         }
+      }
+   }
+   return out;
+}
 
+std::ostream& dump(std::filesystem::path const& filename, std::ostream& out) {
+   out << "filename : " << filename << std::endl;
+//   out << "\ndataset : \"" << dataset << "\"\n";
+   // H5::Exception::dontPrint();
+   H5::H5File file(filename.string().c_str(), H5F_ACC_RDONLY);
+   dump("/", file, out);
+
+   return out;
+}
 
