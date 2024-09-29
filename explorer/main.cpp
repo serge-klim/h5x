@@ -7,23 +7,21 @@
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 #include <csignal>
 #include <cassert>
 
-
-//namespace io = boost::asio;
-void setup_common_options(boost::program_options::options_description& /*description*/);
-//void run(gaz::AppContext&);
-//
 namespace {
 
-//void critical_error_handler(int signal)
-//{
-//   std::signal(signal, SIG_DFL);
-//   boost::stacktrace::safe_dump_to("./backtrace.dump");
-////   std::signal(signal, SIGABORT);
-//}
-//
+void setup_common_options(boost::program_options::options_description& description)
+{
+   // clang-format off
+   description.add_options()
+       ("filename,f", boost::program_options::value<std::vector<std::filesystem::path>>()->multitoken()->required(), "\thdf5 file to chunk")
+       ;
+   // clang-format on
+}
+
 std::filesystem::path config_path(std::filesystem::path app_path)
 {
    app_path += ".config";
@@ -64,16 +62,7 @@ std::ostream& help(std::ostream& out, boost::program_options::options_descriptio
 }
 } // namespace
 
-//#include "spdlog/sinks/stdout_color_sinks.h"
-//#include "spdlog/sinks/rotating_file_sink.h"
-//void extra_logging()
-//{
-//   auto console = spdlog::stdout_color_mt("console");
-//   auto rotating_logger1 = spdlog::rotating_logger_mt("rotating_txt", "logs/rotating.txt", 1048576 * 5, 3);
-//   //auto rotating_logger2 = spdlog::rotating_logger_mt("rotating_txt", "logs/rotating.txt", 1048576 * 5, 3);
-//   spdlog::set_default_logger(console);
-//}
-//
+
 int main(int argc, char* argv[])
 {
    auto description = boost::program_options::options_description{"options"};
@@ -85,13 +74,13 @@ int main(int argc, char* argv[])
             ;
       // clang-format on
       setup_common_options(description);
-      //boost::program_options::positional_options_description positional;
-      //positional.add("config", -1);
+      boost::program_options::positional_options_description positional;
+      positional.add("filename", -1);
 
       boost::program_options::variables_map vm;
       store(boost::program_options::command_line_parser(
                 argc, argv)
-                .options(description) /*.positional(positional)*/.run(),
+                .options(description).positional(positional).run(),
             vm);
 
       if (vm.count("help") != 0) {
@@ -103,37 +92,11 @@ int main(int argc, char* argv[])
          notify(vm); 
       
       std::ostream& dump(std::filesystem::path const& filename, std::ostream& out);
-      dump("C:/Users/serge/Documents/projects/hdf5/build.lin/tools/test/h5diff/testfiles/compounds_array_vlen1.h5", std::clog) << std::endl;
-      std::clog << "===================================================================================================" << std::endl;
-      dump("C:/Users/serge/Documents/projects/hdf5/build.lin/tools/test/h5repack/testfiles/h5repack_nested_8bit_enum.h5", std::clog) << std::endl;
-      std::clog << "===================================================================================================" << std::endl;
-      std::ostream& dump(std::filesystem::path const&, std::string const&, std::ostream&);
-      //dump("C:/Users/serge/Documents/projects/hdf5/build.lin/tools/test/h5diff/testfiles/h5diff_hyper1.h5", "/big", std::clog) << std::endl;
-      dump("C:/Users/serge/Documents/projects/hdf5/build.lin/tools/test/h5repack/testfiles/h5repack_nested_8bit_enum.h5", "/tracks/1/trace", std::clog) << std::endl;
-      dump("C:/Users/serge/Documents/projects/hdf5/build.lin/tools/test/h5diff/testfiles/compounds_array_vlen1.h5", "/dset1", std::clog) << std::endl;
-      dump("c:/Users/serge/Documents/projects/hdf5/tools/testfiles/tscalarstring.h5", "/the_str", std::clog) << std::endl;
-      dump("c:/Users/serge/Documents/projects/hdf5/tools/testfiles/tstring.h5", "/dset1", std::clog) << std::endl;
+      auto filenames = vm["filename"].as<std::vector<std::filesystem::path>>();
+      for (auto const& filename : filenames)
+         dump(filename, std::clog) << "\n\n\n";
 
-//      extra_logging();
-//      std::signal(SIGSEGV, &critical_error_handler);
-//      std::signal(SIGABRT, &critical_error_handler);
-//
-//      {
-//         auto ctx = gaz::AppContext{std::move(vm)};
-//         auto work_guard = io::executor_work_guard{ctx.io_context().get_executor()};
-//         auto threads = make_thread_pool(ctx);
-//         auto signals = boost::asio::signal_set{ctx.io_context(), SIGINT};
-//         signals.async_wait([&ctx](boost::system::error_code /*ec*/, int /*signo*/) {
-//            spdlog::info("shuting down...");
-//            ctx.stop();
-//         });
-//         run(ctx);         
-//         //std::this_thread::sleep_for(std::chrono::seconds{100});
-//         //spdlog::info("...stoping");
-//         //ctx.stop();
-//         std::for_each(begin(threads), end(threads), std::mem_fn(&std::thread::join));
-//      }
-        std::cout << "...done!" << std::endl;
+      std::cout << "...done!" << std::endl;
    } catch (boost::program_options::error& e) {
       std::cerr << "error : " << e.what() << "\n\n";
       help(std::cerr, description);

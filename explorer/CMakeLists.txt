@@ -9,7 +9,6 @@ find_package(Boost COMPONENTS program_options REQUIRED )
 
 add_executable (explorer 
                 main.cpp
-                options.cpp
                 config.hpp
                 h5tool.cpp
                 )

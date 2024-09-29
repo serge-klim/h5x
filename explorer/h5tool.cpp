@@ -1,5 +1,5 @@
 //#include "h5x/iterator.hpp"
-#include "h5x/h5_utility.hpp"
+#include "h5x/h5_info.hpp"
 #include "H5Cpp.h"
 #include "hdf5.h"
 #include <boost/format.hpp>
@@ -31,7 +31,7 @@ std::ostream& dump_chunks(H5::DataSet const& dataset, H5::DataSpace const& datas
 {
    auto dims = std::vector<hsize_t>(H5S_MAX_RANK);
    dims.resize(ds_plist.getChunk(static_cast<int>(dims.size()), dims.data()));
-   out << "\nchunk dims : " << dump_dims(dims);
+   out << "chunk dims : " << dump_dims(dims);
    auto nchunks = hsize_t{0};
    if(auto res = H5Dget_num_chunks(dataset.getId(), dataspace.getId(), &nchunks); res<0)
       throw std::runtime_error{str(boost::format("H5Dget_num_chanks filed %1% ") % res)};
@@ -73,49 +73,15 @@ std::ostream& dump_compount_type(H5::DataType const& type, std::ostream& out)
 
 std::ostream& dump_type(H5::DataType const& type, std::ostream& out)
 {
-   out << " size : " << type.getSize() << ' ';
-   switch (auto cls = type.getClass()) 
-   {
-      case H5T_NO_CLASS:
-         out << "H5T_NO_CLASS"; //<error
-         break;
-      case H5T_INTEGER:
-         out << "H5T_INTEGER"; //<integertypes
-         break;
-      case H5T_FLOAT:
-         out << "H5T_FLOAT"; //<floating-pointtypes
-         break;
-      case H5T_TIME:
-         out << "H5T_TIME"; //<dateandtimetypes
-         break;
-      case H5T_STRING:
-         out << "H5T_STRING"; //<characterstringtypes
-         break;
-      case H5T_BITFIELD:
-         out << "H5T_BITFIELD"; //<bitfieldtypes
-         break;
-      case H5T_OPAQUE:
-         out << "H5T_OPAQUE"; //<opaquetypes
-         break;
+   auto const cls = type.getClass();
+   out << " size : " << type.getSize() << ' ' << h5x::to_string(cls);
+   switch (cls) {
       case H5T_COMPOUND:
-         out << "H5T_COMPOUND"; //<compoundtypes
          dump_compount_type(type, out);
          break;
-      case H5T_REFERENCE:
-         out << "H5T_REFERENCE"; //<referencetypes
-         break;
-      case H5T_ENUM:
-         out << "H5T_ENUM"; //<enumerationtypes
-         break;
-      case H5T_VLEN:
-         out << "H5T_VLEN"; //<variable-Lengthtypes
-         break;
       case H5T_ARRAY:
-         out << "H5T_ARRAY"; //<arraytypes
          dump_type(type.getSuper(), out);
          break;
-      default:
-         out << cls << "<unknown type class>";
    }
    return out;
 }
@@ -123,7 +89,7 @@ std::ostream& dump_type(H5::DataType const& type, std::ostream& out)
 std::ostream& dump(H5::DataSet const& dataset, std::ostream& out)
 {
    auto space = dataset.getSpace();
-   out << "\ndataset size in memory : " << dataset.getInMemDataSize();
+   out << "dataset size in memory : " << dataset.getInMemDataSize();
    out << "\ndataset storage size : " << dataset.getStorageSize();
    out << "\ndataset type: ";
    auto type = dataset.getDataType();
@@ -138,13 +104,13 @@ std::ostream& dump(H5::DataSet const& dataset, std::ostream& out)
    if (rank != 0) {
       auto dims = std::vector<hsize_t>(rank);
       if (auto res = space.getSimpleExtentDims(dims.data(), nullptr); res != dims.size())
-         throw std::runtime_error{str(boost::format("unexpeted simple extent dims %1% (!=%2%)") % res % dims.size())};
+         throw std::runtime_error{str(boost::format("unexpected simple extent dims %1% (!=%2%)") % res % dims.size())};
       out << ' ' << dump_dims(dims);
    }
    out << '\n';
    auto ds_plist = dataset.getCreatePlist();
    auto layout = ds_plist.getLayout();
-   out << h5x::to_string(layout);
+   out << h5x::to_string(layout) << '\n';
    if (layout == H5D_CHUNKED)
       dump_chunks(dataset, space, ds_plist, out);
 
@@ -173,13 +139,12 @@ std::ostream& dump(std::filesystem::path const& filename, std::string const& dat
 }
 
 std::ostream& dump(std::string path, H5::H5Location const& location, std::ostream& out) {
-   out << path << ":\n";
    auto n = location.getNumObjs();
    for (auto i : std::views::iota(decltype(n){0}, n)) {
       H5std_string type_name;
       auto type = location.getObjTypeByIdx(i, type_name);
       auto name = location.getObjnameByIdx(i);
-      out << i << ':' << name << '-' << type_name << '\n';
+      out << i << ':' << path << name << '-' << type_name << ":\n";
       //out << i << ':' << name << ':' << type_name(type) << '\n';
       switch (type) {
          case H5G_DATASET:

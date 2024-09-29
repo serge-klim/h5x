@@ -19,7 +19,8 @@ void setup_common_options(boost::program_options::options_description& descripti
    // clang-format off
    description.add_options()
        ("filename,f", boost::program_options::value<std::filesystem::path>()->required(), "\thdf5 file to chunk")
-       ("chunk-size,s", boost::program_options::value<std::size_t>()->default_value(1024), "\tchunk size")
+       ("chunk-size,s", boost::program_options::value<std::size_t>()->default_value(1024), "\tchunk size (bytes)")
+       ("objects-per-chunk,o", boost::program_options::value<std::size_t>()->default_value(1024), "\tobjects per chunk(sizeof(object) * 'o' = chunk-size)")
        ;
    // clang-format on
 }
