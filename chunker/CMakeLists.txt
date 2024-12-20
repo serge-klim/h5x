@@ -1,5 +1,4 @@
-﻿set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost COMPONENTS program_options log log_setup CONFIG REQUIRED)
+﻿find_package(Boost COMPONENTS program_options log log_setup CONFIG REQUIRED)
 
 add_executable (chunker 
                 main.cpp
@@ -14,8 +13,7 @@ target_link_libraries(chunker
         Boost::program_options
         Boost::log
         Boost::log_setup
-#        hdf5_cpp-static
-        h5x
+        h5x::h5x
 )
 
 target_compile_options(chunker PRIVATE
@@ -23,4 +21,3 @@ target_compile_options(chunker PRIVATE
   $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>
 )
 
-#target_compile_definitions(chunker PUBLIC -DSPDLOG_ACTIVE_LEVEL=0)
