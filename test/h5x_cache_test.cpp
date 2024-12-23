@@ -1,9 +1,6 @@
 #include "test.hpp"
 #include "h5x/h5_types.hpp"
-<<<<<<< HEAD
 #include "h5x/h5_fused.hpp"
-=======
->>>>>>> h5x/read_cache
 #include "h5x/read_cache.hpp"
 #include <boost/test/unit_test.hpp>
 #include <filesystem>
@@ -43,13 +40,8 @@ BOOST_AUTO_TEST_CASE(h5x_read_cache_test)
 {
    H5::H5File file(h5_filename().string().c_str(), H5F_ACC_RDONLY);
    auto dataset = file.openDataSet(stored_dataset_name());
-<<<<<<< HEAD
    auto cache = h5x::read_cache<test::fused::SimpleCompoundType>{dataset, 16};
    auto check_entry = [](h5x::read_cache<test::fused::SimpleCompoundType>& cache, std::size_t ix, test::raw_compound_type const& expected) {
-=======
-   auto cache = h5x::read_cache<test::SimpleCompoundType>{dataset, 16};
-   auto check_entry = [](h5x::read_cache<test::SimpleCompoundType>& cache, std::size_t ix, test::raw_compound_type const& expected) {
->>>>>>> h5x/read_cache
       auto const& val = cache.get(ix);
       BOOST_CHECK_EQUAL(val.a, expected.a);
       BOOST_CHECK_EQUAL(val.b, expected.b);
