@@ -1,18 +1,17 @@
 {
-  "dependencies": [
-    {
-      "name": "hdf5",
-      "features": [
-        "cpp"
-      ]
-    },
+   "dependencies": [
+     {
+       "name": "hdf5",
+       "features": [
+         "cpp"
+       ]
+     },
     "boost-iterator",
-    "boost-program-options",
-    "boost-filesystem",
-    "boost-iostreams",
+    "boost-program-options",       
     "boost-format",
-    "boost-stacktrace",
-    "boost-test",
-    "boost-log"
+    "boost-fusion",
+    "boost-describe",
+    "boost-range",
+    "boost-test"
   ]
 }
