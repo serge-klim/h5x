@@ -80,5 +80,12 @@ jobs:
       run: |
         ${{ steps.strings.outputs.build-output-dir }}/test/unit_test
         llvm-profdata merge -sparse default.profraw -o h5x.profdata
-        llvm-cov show ${{ steps.strings.outputs.build-output-dir }}/test/unit_test -instr-profile=h5x.profdata
+        llvm-cov show ${{ steps.strings.outputs.build-output-dir }}/test/unit_test -instr-profile=h5x.profdata > coverage.txt
 
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: true          
+        verbose: true
+        files: ./coverage.txt
