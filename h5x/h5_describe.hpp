@@ -4,6 +4,7 @@
 #include <boost/describe.hpp>
 #include <type_traits>
 #include <cstddef>
+#include <cassert>
 
 namespace h5x { inline namespace v0_1 {
 

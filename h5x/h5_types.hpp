@@ -2,7 +2,6 @@
 #include "H5Cpp.h"
 #include <type_traits>
 #include <cstddef>
-#include <cstdint>
 
 
 namespace h5x { inline namespace v0_1 {

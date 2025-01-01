@@ -5,6 +5,7 @@
 #include <boost/range/iterator_range_core.hpp>
 #include <memory>
 #include <type_traits>
+#include <cstddef>
 #include <cassert>
 
 namespace h5x { inline namespace v0_1 {
@@ -15,7 +16,7 @@ class ConstIterator
 {
  public:
    ConstIterator(std::shared_ptr<detail::View<T>> view, hsize_t offset) noexcept(std::is_nothrow_move_constructible<std::shared_ptr<detail::View<T>>>::value) : view_{std::move(view)}, offset_{offset} {}
-   ConstIterator(std::shared_ptr<detail::View<T>> view) noexcept(std::is_nothrow_move_constructible<std::shared_ptr<detail::View<T>>>::value) : view_{std::move(view)}, offset_{view.offset()} {}
+   explicit ConstIterator(std::shared_ptr<detail::View<T>> view) noexcept(std::is_nothrow_move_constructible<std::shared_ptr<detail::View<T>>>::value) : view_{std::move(view)}, offset_{view.offset()} {}
 
    void increment() noexcept
    {

@@ -2,6 +2,9 @@
 #include <boost/test/unit_test.hpp>
 #include "test.hpp"
 #include "H5Cpp.h"
+#include <vector>
+#include <filesystem>
+
 
 
 H5::CompType test::raw_compound_type_h5_type() {
