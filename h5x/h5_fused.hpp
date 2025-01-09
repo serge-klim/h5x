@@ -13,7 +13,7 @@ namespace h5x { inline namespace v0_1 {
 template <typename T>
 struct h5_type<T, std::bool_constant<boost::fusion::traits::is_sequence<T>::value>>
 {
-   H5::DataType operator()() const noexcept
+   H5::CompType operator()() const noexcept
    {
       H5::CompType type{sizeof(T)};
       boost::mp11::mp_for_each<boost::mp11::mp_iota_c<boost::fusion::result_of::size<T>::value>>([&type](auto I) {

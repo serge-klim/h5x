@@ -14,7 +14,7 @@ template<typename T, typename U, U T::* P> struct h5_member_type<P> : h5_type<U>
 template <typename T>
 struct h5_type<T, typename boost::describe::has_describe_members<T>::type>
 {
-   H5::DataType operator()() const noexcept
+   H5::CompType operator()() const noexcept
    {
       H5::CompType type{sizeof(T)};
       boost::mp11::mp_for_each<boost::describe::describe_members<T, boost::describe::mod_public>>([&](auto member) {

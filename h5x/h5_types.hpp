@@ -113,6 +113,15 @@ struct h5_type<long double, std::true_type>
 template <typename T>
 struct h5_type<T, typename std::is_enum<T>::type> : h5_type<typename std::underlying_type<T>::type>{};
 
+
+template <typename T, std::size_t N>
+struct h5_type<std::array<T, N>, std::true_type> {
+  H5::ArrayType operator()() const noexcept {
+    auto size = static_cast<hsize_t>(N);
+    return {h5_type<T>{}(), 1, &size};
+  }
+};
+
 }/*inline namespace v0_1*/} // namespace h5x
 
 

@@ -7,10 +7,11 @@ target_sources(h5x PUBLIC FILE_SET HEADERS
 				FILES
                  h5x.hpp
                  h5_info.hpp
-                 iterator.hpp
                  h5_types.hpp
 				 h5_fused.hpp
 				 h5_describe.hpp
+                 iterator.hpp
+				 data_sink.hpp
                  read_cache.hpp
                  detail/view.hpp
                  detail/read_cache.hpp
@@ -20,7 +21,7 @@ add_library (h5x::h5x ALIAS h5x)
 
 target_include_directories(h5x INTERFACE
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
-		$<INSTALL_INTERFACE:include/h5x>
+		$<INSTALL_INTERFACE:include>
 		)
 
 target_link_libraries(h5x INTERFACE

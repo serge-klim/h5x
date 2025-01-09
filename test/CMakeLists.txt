@@ -6,6 +6,7 @@ add_executable (unit_test
         cache_test.cpp
         h5x_cache_test.cpp
         iterator_test.cpp
+        data_sink_test.cpp
 )
 
 target_link_libraries(unit_test
