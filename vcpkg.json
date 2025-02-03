@@ -1,13 +1,13 @@
 {
-   "dependencies": [
-     {
-       "name": "hdf5",
-       "features": [
-         "cpp"
-       ]
-     },
+  "dependencies": [
+    {
+      "name": "hdf5",
+      "features": [
+        "cpp"
+      ]
+    },
     "boost-iterator",
-    "boost-program-options",       
+    "boost-program-options",
     "boost-format",
     "boost-fusion",
     "boost-describe",
