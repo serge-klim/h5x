@@ -1,7 +1,7 @@
 ﻿find_package(Boost CONFIG REQUIRED)
 find_package(hdf5 REQUIRED COMPONENTS C CXX CONFIG)
 
-add_library (h5x
+add_library (h5x STATIC
 			data_sink.cpp
 			)
 
@@ -28,7 +28,6 @@ target_include_directories(h5x INTERFACE
 
 target_link_libraries(h5x PUBLIC
                         Boost::boost
-#                       hdf5::hdf5
                         hdf5::hdf5_cpp$<IF:$<BOOL:${HDF5_LINK_STATICALLY}>,-static,-shared>
                         )
 
